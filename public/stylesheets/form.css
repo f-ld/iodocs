@@ -13,7 +13,7 @@
 
 .row  {
 	display: table-row;
-	width: 82%;
+	width: 98%;
 	float: left;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .col-description {
-	width: 40%;
+	width: 50%;
 }
 
 .ui-widget-content { 

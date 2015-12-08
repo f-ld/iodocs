@@ -41,8 +41,14 @@ block content
                   - else if (apiInfo.auth == 'basicAuth')
                     label(for='username') User name
                     input(id='username', name='username', value=defaultKey, style='color=#EEEEEE')
-                  - else
+                  - else if (apiInfo.auth.keySecret)
                     label(for='key') API Key
+                    - var secure =''
+                    input(id='key', name='key', value=defaultKey, style='color=#EEEEEE')
+                    label(for='secret') API Secret
+                    input(id='secret', name='secret', value=defaultSecret, style='color=#EEEEEE')
+                  - else
+                    label(for='secret') API Key
                     - var secure =''
                     input(id='key', name='key', value=defaultKey, style='color=#EEEEEE')
               div
@@ -78,6 +84,14 @@ block content
           li
               a#toggle-methods(href='#') Toggle All Methods
 
+  form#commonParameters
+      - if (apiInfo.commonParameters)
+          section(class='commonParameters ' + authed)
+          - each param, paramName in apiInfo.commonParameters
+            label(for=paramName) !{param.description}
+            input(id=paramKey, name=paramKey, value=param.default, style='color=#EEEEEE')
+
+
   ul
       - each resource, resourceName in apiInfo.resources
           li.resource
@@ -106,17 +120,21 @@ block content
                               input(type='hidden', name='httpMethod', value=method.httpMethod)
                               input(type='hidden', name='oauth', value=secure)
                               input(type='hidden', name='methodUri', value=method.path)
+                              input(type='hidden', name='basePath', value=method.basePath)
                               input(type='hidden', name='accessToken', id='accessToken')
                               input(type='hidden', name='json', id=methodKey + 'json')
                               input(type='hidden', name='locations', id=methodKey + 'locations')
 
                               span.description !{method.description}
+                              if method.documentation
+                                br
+                                br
+                                a(class='documentation', target="_blank", href=method.documentation) Documentation
                               br
                               br
                               .container.header
                                 .row
                                   .col-description.header Description !{method.MethodName}
-                                  .location.header Location
                                   .col-type.header Type
                                   .col-parameter.header Value
                                   .col-name.header Parameter

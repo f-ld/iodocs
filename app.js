@@ -603,6 +603,7 @@ function processRequest(req, res, next) {
         params    = {},
         json      = reqQuery.json || {},
         locations = reqQuery.locations || {},
+	basePath = reqQuery.basePath,
         methodURL = reqQuery.methodUri,
         httpMethod = reqQuery.httpMethod,
         apiKey = reqQuery.apiKey,
@@ -611,7 +612,12 @@ function processRequest(req, res, next) {
         apiConfig = JSON.parse(JSON.minify(fs.readFileSync(path.join(config.apiConfigDir, apiName + '.json'), 'utf8'))),
         key = req.sessionID + ':' + apiName,
         implicitAccessToken = reqQuery.accessToken;
-
+    
+    if (basePath != '' && basePath != "undefined" && basePath != undefined) {
+	apiConfig.basePath = basePath;
+    }
+    console.log("apiConfig.basePath: ", apiConfig.basePath);
+    
     json = JSON.parse(json);
     locations = JSON.parse(locations);
     console.log("json: ", json);
@@ -765,7 +771,9 @@ function processRequest(req, res, next) {
                     oauth1_crypt
              );
 
-            var resource = options.host + options.path,
+            var portInfo = '';
+            if (options.port) portInfo = ':' + options.port;
+            var resource = options.host + portInfo + options.path,
                 cb = function(error, data, response) {
                     if (error) {
                         if (error.data == 'Server Error' || error.data == '') {
@@ -796,7 +804,9 @@ function processRequest(req, res, next) {
                         req.resultHeaders = req.resultHeaders || 'None';
                     }
 
-                    req.call = url.parse(options.host + options.path);
+                    var portInfo = '';
+                    if (options.port) portInfo = ':' + options.port;
+                    req.call = url.parse(options.host + portInfo + options.path);
                     req.call = url.format(req.call);
 
                     // Response body
@@ -936,10 +946,48 @@ function processRequest(req, res, next) {
     function unsecuredCall() {
         console.log('Unsecured Call');
 
-        options.path += ((paramString.length > 0) ? '?' + paramString : "");
+	var paramSep = '?';
+	if (options.path.indexOf('?') !== -1) {
+	    paramSep = '&';
+	}
+        options.path += ((paramString.length > 0) ? paramSep + paramString : "");
 
         // Add API Key to params, if any.
-        if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
+        if (apiConfig.auth != undefined && apiConfig.auth.keySecret != 'undefined') {
+	    if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
+                if (apiConfig.auth.keySecret.location === 'header') {
+                    options.headers = (options.headers === void 0) ? {} : options.headers;
+                    options.headers[apiConfig.auth.keySecret.key_param] = apiKey;
+                }
+                else {
+                    if (options.path.indexOf('?') !== -1) {
+                        options.path += '&';
+                    }
+                    else {
+                        options.path += '?';
+                    }
+                    console.log(apiConfig.auth.keySecret.key_param);
+                    options.path += apiConfig.auth.keySecret.key_param + '=' + apiKey;
+                }
+	    }
+	    if (apiSecret != '' && apiSecret != 'undefined' && apiSecret != undefined) {
+                if (apiConfig.auth.keySecret.location === 'header') {
+                    options.headers = (options.headers === void 0) ? {} : options.headers;
+                    options.headers[apiConfig.auth.keySecret.secret_param] = apiSecret;
+                }
+                else {
+                    if (options.path.indexOf('?') !== -1) {
+                        options.path += '&';
+                    }
+                    else {
+                        options.path += '?';
+                    }
+                    console.log(apiConfig.auth.keySecret.secret_param);
+                    options.path += apiConfig.auth.keySecret.secret_param + '=' + apiSecret;
+                }
+	    }	
+	}
+        else if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
             if (apiConfig.auth.key.location === 'header') {
                 options.headers = (options.headers === void 0) ? {} : options.headers;
                 options.headers[apiConfig.auth.key.param] = apiKey;
@@ -1053,7 +1101,9 @@ function processRequest(req, res, next) {
                 if (options.headers) req.requestHeaders = options.headers;
                 if (requestBody) req.requestBody = requestBody;
                 req.resultHeaders = response.headers;
-                req.call = url.parse(options.host + options.path);
+                var portInfo = '';
+                if (options.port) portInfo = ':' + options.port;
+                req.call = url.parse(options.host + portInfo + options.path);
                 req.call = url.format(req.call);
 
                 // Response body

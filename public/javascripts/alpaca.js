@@ -13492,7 +13492,8 @@ var equiv = function () {
         {
             if (this.field) {
                 var val = this.field.val();
-                if (!val)
+		// Support switching back to None in enums
+                if (val != '' && !val)
                 {
                     val = this.data;
                 }

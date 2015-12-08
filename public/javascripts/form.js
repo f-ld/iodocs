@@ -244,7 +244,7 @@ $(document).ready(function() {
                             "controlFieldMessage": '<div></div>',
                             "controlFieldLabel": '{{if options.label}}<div class="col-name body {{if options.labelClass}}${options.labelClass}{{/if}}">${options.label}</div>{{/if}}',
                             "controlFieldHelper": '{{if options.helper}}<div class="col-description body {{if options.helperClass}}${options.helperClass}{{/if}} alpaca-controlfield-helper-text">${options.helper}</div>{{/if}}',
-                            "controlFieldLocation": '<div class="location body alpaca-data-label">${ this.data.schema.location }</div>',
+                            "controlFieldLocation": '<!--<div class="location body alpaca-data-label">${ this.data.schema.location }</div>-->',
                             "controlFieldType": '<div class="col-type body alpaca-data-label">${ this.data.schema.type }</div>',
                             "controlFieldContainer": '<div class="col-parameter body"></div>{{html this.html}}',
                             "controlField": '<div class="required row">{{html Alpaca.fieldTemplate(this,"controlFieldHelper")}}{{html Alpaca.fieldTemplate(this,"controlFieldLocation")}}{{html Alpaca.fieldTemplate(this,"controlFieldType")}}{{wrap(null, {}) Alpaca.fieldTemplate(this,"controlFieldContainer",true)}}{{/wrap}}{{html Alpaca.fieldTemplate(this,"controlFieldLabel")}}{{wrap(null, {}) Alpaca.fieldTemplate(this,"controlFieldOuterEl",true)}}{{/wrap}}</div>',
