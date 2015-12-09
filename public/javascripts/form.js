@@ -4,9 +4,11 @@ $.ajaxSetup({
 
 $(document).ready(function() {
     var apiName = $('.apiName').attr('id');
+    var apiDir = $('.apiDir').attr('id');
+    if (!apiDir) { apiDir = ''; }
     if (apiName) {
         // Loads the proper JSON file
-        $.getJSON("../data/"+apiName+".json", function(json) {
+        $.getJSON(apiDir+apiName+".json", function(json) {
             apiJson = json;
         });
 

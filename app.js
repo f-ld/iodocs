@@ -1177,6 +1177,15 @@ function checkObjVal(obj /*, val, level1, level2, ... levelN*/) {
 function dynamicHelpers(req, res, next) {
     if (req.params.api) {
         res.locals.apiInfo = JSON.parse(JSON.minify(fs.readFileSync(path.join(config.apiConfigDir, req.params.api + '.json'), 'utf8')));
+        var match = config.apiConfigDir.match('^.*public/(.*)$');
+        if (match) {
+            res.locals.apiDir = match[1];
+            if (!res.locals.apiDir.match('/$')) {
+                res.locals.apiDir += '/';
+            }
+        } else {
+            res.locals.apiDir = '';
+        }
         res.locals.apiName = req.params.api;
 
         // If the cookie says we're authed for this particular API, set the session to authed as well
